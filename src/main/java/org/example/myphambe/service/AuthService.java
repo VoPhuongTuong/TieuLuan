@@ -228,7 +228,7 @@ public void verifyOtp(VerifyOtpRequest request) {
                 .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
 
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
-        long expireAt = System.currentTimeMillis() + 60_000; // 1 phút
+        long expireAt = System.currentTimeMillis() + 300_000; // 1 phút
 
         resetOtpStorage.put(request.getEmail(), new OtpData(otp, expireAt));
         sendOtpEmail(request.getEmail(), otp);

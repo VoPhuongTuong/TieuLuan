@@ -10,7 +10,11 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final String SECRET =
+            "mypham-secret-key-mypham-secret-key-123456";
+
+    private final Key key =
+            Keys.hmacShaKeyFor(SECRET.getBytes());
 
     private final long EXPIRATION = 1000 * 60 * 60 * 24; // 1 ngày
 
