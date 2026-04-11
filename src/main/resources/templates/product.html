@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chi tiết sản phẩm</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container chính */
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        /* Header với tên sản phẩm */
+        .product-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 24px 20px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 8s infinite;
+        }
+
+        .product-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .product-sub {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .product-sub i {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Logo và ảnh chung khung */
+        .media-section {
+            background: #ffffff;
+            padding: 0 24px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .media-frame {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        /* Logo nhỏ trong khung ảnh */
+
+
+        .logo-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 3;
+
+            width: 200px;   /* chỉnh size ở đây */
+        }
+
+        .logo-badge img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* Hình ảnh sản phẩm */
+        .image-box {
+            width: 100%;
+            height: 320px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .image-box img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .image-box img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Nội dung chi tiết */
+        .content {
+            padding: 24px;
+        }
+
+        /* Giá tiền */
+        .price-section {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .price-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: 800;
+            color: #E53935;
+            letter-spacing: -0.5px;
+        }
+
+        .price small {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Thông tin thương hiệu */
+        .brand-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .brand-info {
+            flex: 1;
+        }
+
+        .brand-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .brand-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Mô tả sản phẩm */
+        .description-section {
+            margin-top: 8px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .description {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.8;
+            text-align: justify;
+            background: #faf9ff;
+            white-space: pre-line;
+
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        /* Nút hành động */
+        .action-buttons {
+            padding: 20px 24px 30px 24px;
+            background: #ffffff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Not found */
+        .not-found {
+            text-align: center;
+            padding: 60px 30px;
+            background: white;
+            border-radius: 32px;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .not-found i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            body {
+                padding: 12px;
+            }
+
+            .product-header {
+                padding: 24px 20px 16px 20px;
+            }
+
+            .product-name {
+                font-size: 24px;
+            }
+
+            .media-section {
+                padding: 0 16px;
+            }
+
+            .image-box {
+                height: 280px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .price {
+                font-size: 28px;
+            }
+
+            .logo-badge {
+                width: 150px;   /* nhỏ vừa mobile */
+                top: 13px;
+                left: 13px;
+            }
+
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<div class="container" th:if="${product != null}">
+
+    <!-- HEADER: Tên sản phẩm lên đầu -->
+    <div class="product-header">
+        <div class="product-name" th:text="${product.name}" id="productName"></div>
+        <div class="product-sub">
+            <span></i> Sản phẩm chính hãng</span>
+            <span></i> Còn hàng</span>
+        </div>
+    </div>
+
+    <!-- KHUNG LOGO + HÌNH ẢNH CHUNG -->
+    <div class="media-section">
+        <div class="media-frame">
+            <!-- Logo badge trong khung ảnh -->
+            <div class="logo-badge" id="logoHomeBtn">
+                <img src="/images/logos.png" alt="logo">
+            </div>
+
+            <!-- Hình ảnh sản phẩm -->
+            <div class="image-box">
+                <img th:src="${product.imageUrl}" alt="product image" id="productImage">
+            </div>
+        </div>
+    </div>
+
+    <!-- NỘI DUNG CHI TIẾT -->
+    <div class="content">
+        <!-- Giá tiền -->
+        <div class="price-section">
+            <span class="price-label"></i> Giá bán</span>
+            <div class="price">
+                <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}" id="productPrice"></span>
+                <small>đ</small>
+            </div>
+        </div>
+
+        <!-- Thương hiệu -->
+        <div class="brand-section">
+            <div class="brand-icon">
+                <i class="fas fa-store"></i>
+            </div>
+            <div class="brand-info">
+                <div class="brand-label">Thương hiệu</div>
+                <div class="brand-name" th:text="${product.brand}" id="productBrand"></div>
+            </div>
+        </div>
+
+        <!-- Mô tả sản phẩm -->
+        <div class="description-section">
+            <div class="section-title">
+                <span>Mô tả sản phẩm</span>
+            </div>
+            <div class="description" th:text="${product.description}" id="productDesc"></div>
+        </div>
+    </div>
+
+    <!-- Nút hành động -->
+    <div class="action-buttons">
+        <button class="btn" id="appButton">
+            Tải App Để Mua Sắm
+        </button>
+    </div>
+</div>
+
+<!-- Trường hợp không có sản phẩm -->
+<div class="not-found" th:if="${product == null}">
+    <i class="fas fa-box-open"></i>
+    <div style="font-size: 18px; color: #666;">❌ Không tìm thấy sản phẩm</div>
+</div>
+
+<script>
+    (function() {
+        // Xử lý click logo
+        const logoBtn = document.getElementById('logoHomeBtn');
+        if (logoBtn) {
+            logoBtn.addEventListener('click', () => {
+                // Hiệu ứng nhẹ khi click
+                logoBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    logoBtn.style.transform = 'scale(1)';
+                }, 150);
+                console.log('Logo clicked - chuyển về home');
+            });
+        }
+
+        // Xử lý nút app
+        const appBtn = document.getElementById('appButton');
+        if (appBtn) {
+            appBtn.addEventListener('click', () => {
+                appBtn.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    appBtn.style.transform = 'scale(1)';
+                }, 150);
+                console.log('App button clicked');
+            });
+        }
+
+        // Fallback cho dữ liệu demo nếu không có từ server
+        if (!document.getElementById('productName')?.innerText) {
+            const demoName = document.getElementById('productName');
+            const demoPrice = document.getElementById('productPrice');
+            const demoBrand = document.getElementById('productBrand');
+            const demoDesc = document.getElementById('productDesc');
+            const demoImg = document.getElementById('productImage');
+
+            if (demoName && !demoName.innerText) {
+                demoName.innerText = "Kem Dưỡng Ẩm Hồng Sâm";
+                if (demoPrice) demoPrice.innerText = "289,000";
+                if (demoBrand) demoBrand.innerText = "Ohui";
+                if (demoDesc) demoDesc.innerText = "✨ Sản phẩm dưỡng ẩm chuyên sâu với chiết xuất nhân sâm Hàn Quốc\n\n✔️ Cấp ẩm tức thì\n✔️ Dưỡng da trắng sáng\n✔️ An toàn cho da nhạy cảm\n✔️ Không chứa paraben";
+                if (demoImg) demoImg.src = "https://placehold.co/400x400/FFE0F0/667eea?text=Cosmetic";
+            }
+        }
+    })();
+</script>
+
+</body>
+</html>
