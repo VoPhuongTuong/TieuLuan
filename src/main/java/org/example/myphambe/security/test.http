@@ -1,0 +1,24 @@
+### 1. Lấy danh sách sản phẩm (GET)
+GET http://localhost:8080/api/products
+Accept: application/json
+
+### 2. Gửi tin nhắn cho AI (POST)
+POST http://localhost:8080/api/chat/send
+Content-Type: application/json
+
+{
+  "message": "Shop còn kem chống nắng không?"
+}
+
+### 3. Đăng nhập để lấy Token (Ví dụ)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123"
+}
+
+### 4. Test API cần quyền Admin (Dùng Token)
+GET http://localhost:8080/api/admin/orders
+Authorization: Bearer {{auth_token}}

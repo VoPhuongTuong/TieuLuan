@@ -36,9 +36,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll()
-                                .requestMatchers("/api/payment/**").permitAll()
-
-                                .requestMatchers("/api/cart/**").permitAll()
+                        .requestMatchers("/api/payment/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll() // Thêm dòng này vào cấu hình Security của bạn
+                        .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/api/QR/**").permitAll() // 👈 cho phép QR
 
                         .anyRequest().authenticated()
