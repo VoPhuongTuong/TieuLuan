@@ -1,18 +1,23 @@
 package org.example.myphambe.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.myphambe.entity.Order;
 import org.example.myphambe.repository.OrderRepository;
 import org.example.myphambe.service.VNPayService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+//@RestController
+@Controller
+
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
+@ResponseBody
 public class PaymentController {
 
     private final OrderRepository orderRepository;
@@ -29,7 +34,8 @@ public class PaymentController {
 //        Order order = orderRepository.findById(orderId)
 //                .orElseThrow(() -> new RuntimeException("Order not found"));
 //
-////        String ip = request.getRemoteAddr();
+
+    /// /        String ip = request.getRemoteAddr();
 //        String ip = request.getHeader("X-FORWARDED-FOR");
 //        if (ip == null || ip.isEmpty()) {
 //            ip = request.getRemoteAddr();
@@ -51,19 +57,26 @@ public class PaymentController {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
+//        String ip = request.getHeader("X-FORWARDED-FOR");
+//        if (ip == null || ip.isEmpty()) {
+//            ip = request.getRemoteAddr();
+//        }
         String ip = request.getHeader("X-FORWARDED-FOR");
+
         if (ip == null || ip.isEmpty()) {
             ip = request.getRemoteAddr();
         }
 
+// fix localhost IPv6
+        if (ip.equals("0:0:0:0:0:0:0:1")) {
+            ip = "127.0.0.1";
+        }
+
+
         // ✅ FIX QUAN TRỌNG: nhân 100
-//        String paymentUrl = vnPayService.createPaymentUrl(orderId, amount * 100, ip);
         String paymentUrl = vnPayService.createPaymentUrl(orderId, amount, ip);
         return Map.of("paymentUrl", paymentUrl);
     }
-
-
-    // ===================== RETURN =====================
     @GetMapping("/vnpay-return")
     public String vnpayReturn(HttpServletRequest request) throws Exception {
 
@@ -74,20 +87,16 @@ public class PaymentController {
         });
 
         String secureHash = params.get("vnp_SecureHash");
-
         boolean valid = vnPayService.verifySignature(params, secureHash);
-
-        if (!valid) {
-            return "Invalid signature";
-        }
-
         String responseCode = params.get("vnp_ResponseCode");
-        int orderId = Integer.parseInt(params.get("vnp_TxnRef"));
+        String txnRef = params.get("vnp_TxnRef");
 
+        // Lấy orderId từ txnRef (VNPAY trả về)
+        int orderId = Integer.parseInt(txnRef);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        if ("00".equals(responseCode)) {
+        if (valid && "00".equals(responseCode)) {
             order.setStatus("PAID");
         } else {
             order.setStatus("FAILED");
@@ -95,8 +104,12 @@ public class PaymentController {
 
         orderRepository.save(order);
 
-        return responseCode.equals("00")
-                ? "Thanh toán thành công"
-                : "Thanh toán thất bại";
+        /**
+         * ✅ THAY ĐỔI QUAN TRỌNG TẠI ĐÂY:
+         * Thay vì redirect về myapp:// (Deeplink), ta trả về nội dung text.
+         * Khi WebView load trang này, React Native sẽ thấy URL có
+         * vnp_ResponseCode=00 và tự động đóng Modal.
+         */
+        return "PAYMENT_COMPLETED";
     }
 }
