@@ -39,8 +39,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/payment/**").permitAll()
                         .requestMatchers("/api/chat/**").permitAll() // Thêm dòng này vào cấu hình Security của bạn
                         .requestMatchers("/api/cart/**").permitAll()
-                        .requestMatchers("/api/QR/**").permitAll() // 👈 cho phép QR
+                                .requestMatchers("/api/orders/**").permitAll()
 
+                                .requestMatchers("/api/QR/**").permitAll() // 👈 cho phép QR
+                                .requestMatchers(
+                                        "/images/**",
+                                        "/css/**",
+                                        "/js/**",
+                                        "/favicon.ico"
+                                ).permitAll()
                         .anyRequest().authenticated()
 //                        .anyRequest().permitAll()
                 )

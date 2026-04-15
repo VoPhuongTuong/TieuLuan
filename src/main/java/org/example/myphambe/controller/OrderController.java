@@ -3,6 +3,7 @@ package org.example.myphambe.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.myphambe.dto.CartItemRequest;
 import org.example.myphambe.dto.OrderRequest;
+import org.example.myphambe.dto.OrderResponse;
 import org.example.myphambe.entity.Order;
 import org.example.myphambe.service.OrderService;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,11 @@ public class OrderController {
         Order order = orderService.createOrder(userId, cartItems);
         return ResponseEntity.ok(order);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderResponse>> getOrdersByUser(@PathVariable Integer userId) {
+        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+    }
+
 
 }

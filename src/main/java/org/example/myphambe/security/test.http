@@ -22,3 +22,30 @@ Content-Type: application/json
 ### 4. Test API cần quyền Admin (Dùng Token)
 GET http://localhost:8080/api/admin/orders
 Authorization: Bearer {{auth_token}}
+
+### 🔥 LẤY DANH SÁCH ORDER (KHÔNG TOKEN)
+GET http://localhost:8080/api/orders/user/1
+Content-Type: application/json
+
+
+### 🔥 LẤY DANH SÁCH ORDER (CÓ TOKEN)
+GET http://localhost:8080/api/orders/user/10
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+
+### 🔥 TẠO ORDER
+POST http://localhost:8080/api/orders/create/1
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+[
+  {
+    "productId": 1,
+    "quantity": 2
+  },
+  {
+    "productId": 2,
+    "quantity": 1
+  }
+]

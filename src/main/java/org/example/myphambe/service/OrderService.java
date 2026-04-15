@@ -1,8 +1,7 @@
 package org.example.myphambe.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.myphambe.dto.CartItemRequest;
-import org.example.myphambe.dto.OrderRequest;
+import org.example.myphambe.dto.*;
 import org.example.myphambe.entity.Order;
 import org.example.myphambe.entity.OrderItem;
 import org.example.myphambe.entity.Product;
@@ -55,5 +54,41 @@ public class OrderService {
         order.setTotalPrice(total);
 
         return orderRepository.save(order);
+    }
+
+
+    public List<OrderResponse> getOrdersByUser(Integer userId) {
+
+        List<Order> orders = orderRepository.findByUserId(userId);
+
+        return orders.stream().map(order -> {
+
+            OrderResponse dto = new OrderResponse();
+            dto.setOrderId(order.getOrderId());
+            dto.setStatus(order.getStatus());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setOrderDate(order.getOrderDate());
+
+
+            List<OrderItemDTO> items = order.getItems().stream().map(item -> {
+
+                ProductDTO p = new ProductDTO();
+                p.setId(item.getProduct().getId());
+                p.setName(item.getProduct().getName());
+                p.setImageUrl(item.getProduct().getImageUrl());
+
+                OrderItemDTO i = new OrderItemDTO();
+                i.setProductId(item.getProduct().getId());
+                i.setQuantity(item.getQuantity());
+                i.setPrice(item.getPrice());
+                i.setProduct(p);
+
+                return i;
+            }).toList();
+
+            dto.setItems(items);
+
+            return dto;
+        }).toList();
     }
 }
