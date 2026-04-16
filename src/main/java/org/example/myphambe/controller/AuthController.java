@@ -3,16 +3,23 @@ package org.example.myphambe.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.myphambe.dto.*;
 import org.example.myphambe.service.AuthService;
+import org.example.myphambe.service.FacebookAuthService;
+import org.example.myphambe.service.GoogleAuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Sử dụng cái này để tự động inject các "final" bên dưới
 @CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AuthService authService;
+    private final GoogleAuthService googleAuthService;
+    private final FacebookAuthService facebookAuthService;
 
     // ===== REGISTER =====
     @PostMapping("/register")
@@ -28,12 +35,13 @@ public class AuthController {
         return ResponseEntity.ok("Xác thực thành công");
     }
 
-    // ===== LOGIN =====
+    // ===== LOGIN THƯỜNG =====
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    // --- QUÊN MẬT KHẨU ---
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request);
@@ -52,5 +60,32 @@ public class AuthController {
         return ResponseEntity.ok("OTP mới đã được gửi");
     }
 
+    // --- ĐĂNG NHẬP GOOGLE ---
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
+        try {
+            String idToken = request.get("token");
+            if (idToken == null || idToken.isEmpty()) {
+                return ResponseEntity.badRequest().body("Token không được để trống");
+            }
+            return ResponseEntity.ok(googleAuthService.authenticateGoogleUser(idToken));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Lỗi Google: " + e.getMessage());
+        }
+    }
 
+    // --- ĐĂNG NHẬP FACEBOOK ---
+    @PostMapping("/facebook")
+    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> request) {
+        try {
+            String accessToken = request.get("accessToken");
+            if (accessToken == null || accessToken.isEmpty()) {
+                return ResponseEntity.badRequest().body("Access Token không được để trống");
+            }
+            // Gọi qua Service để xử lý trọn gói và trả về LoginResponse chuẩn (id, fullName, email, role, token)
+            return ResponseEntity.ok(facebookAuthService.authenticateFacebookUser(accessToken));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Lỗi Facebook: " + e.getMessage());
+        }
+    }
 }
