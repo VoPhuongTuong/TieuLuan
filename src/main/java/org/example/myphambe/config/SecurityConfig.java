@@ -34,22 +34,25 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/payment/**").permitAll()
-                        .requestMatchers("/api/chat/**").permitAll() // Thêm dòng này vào cấu hình Security của bạn
-                        .requestMatchers("/api/cart/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/products/**").permitAll()
+                                .requestMatchers("/api/payment/**").permitAll()
+                                .requestMatchers("/api/chat/**").permitAll()
+                                .requestMatchers("/api/cart/**").permitAll()
                                 .requestMatchers("/api/orders/**").permitAll()
+                                .requestMatchers("/api/reviews/**").permitAll()
 
-                                .requestMatchers("/api/QR/**").permitAll() // 👈 cho phép QR
+                                .requestMatchers("/api/chat/**").permitAll()
+
+
+                                .requestMatchers("/api/QR/**").permitAll()
                                 .requestMatchers(
                                         "/images/**",
                                         "/css/**",
                                         "/js/**",
                                         "/favicon.ico"
                                 ).permitAll()
-                        .anyRequest().authenticated()
-//                        .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(httpBasic -> httpBasic.disable())
@@ -88,6 +91,7 @@ public class SecurityConfig {
 
         return source;
     }
+
     @Bean
     public org.springframework.web.client.RestTemplate restTemplate() {
         return new org.springframework.web.client.RestTemplate();

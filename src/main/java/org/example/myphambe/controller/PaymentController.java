@@ -52,7 +52,7 @@ public class PaymentController {
         }
 
         // ⚠️ QUAN TRỌNG: nhân 100 tại đây nếu frontend chưa làm
-        long finalAmount = amount * 100;
+        long finalAmount = amount;
 
         String paymentUrl = vnPayService.createPaymentUrl(orderId, finalAmount, ip);
 

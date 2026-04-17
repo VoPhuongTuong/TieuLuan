@@ -1,7 +1,9 @@
 ### 1. Lấy danh sách sản phẩm (GET)
-GET http://localhost:8080/api/products
+GET http://localhost:8080/api/products/1
 Accept: application/json
-
+### 1. Lấy danh sách sản phẩm (GET)
+GET http://localhost:8080/api/reviews/product/1
+Accept: application/json
 ### 2. Gửi tin nhắn cho AI (POST)
 POST http://localhost:8080/api/chat/send
 Content-Type: application/json
