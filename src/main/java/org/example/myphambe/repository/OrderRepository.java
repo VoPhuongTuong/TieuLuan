@@ -12,4 +12,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @EntityGraph(attributePaths = {"items", "items.product"})
     List<Order> findByUserId(Integer userId);
 
+    @EntityGraph(attributePaths = {"items", "items.product"})
+    java.util.Optional<Order> findById(Integer orderId); // Ghi đè hàm mặc định
 }

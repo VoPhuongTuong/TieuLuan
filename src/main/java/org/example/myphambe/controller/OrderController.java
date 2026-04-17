@@ -19,12 +19,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-//    @PostMapping
-//
-//    public O
-//    rder createOrder(@RequestBody OrderRequest request) {
-//        return orderService.createOrder(request);
-//    }
     @PostMapping("/create/{userId}")
     public ResponseEntity<Order> createOrder(
             @PathVariable Integer userId,
@@ -38,5 +32,35 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
+    //    // Lấy chi tiết đơn hàng
+//    @GetMapping("/{orderId}")
+//    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer orderId) {
+//        return ResponseEntity.ok(orderService.getOrderById(orderId));
+//    }
+// Trong OrderService.java
+// Sửa lại đoạn này trong OrderController.java
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer orderId) {
+        return ResponseEntity.ok(orderService.getOrderById(orderId));
+    }
 
+    // Hủy đơn hàng
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<String> cancelOrder(@PathVariable Integer orderId) {
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.ok("Đã hủy đơn hàng thành công");
+    }
+
+//    @PostMapping("/create/{userId}")
+//    public ResponseEntity<OrderResponse> createOrder(...) {
+//        Order order = orderService.createOrder(userId, cartItems);
+//        // Chuyển sang Response DTO trước khi trả về
+//        return ResponseEntity.ok(orderService.mapToOrderResponse(order));
+//    }
+
+    @PostMapping("/{orderId}/reorder")
+    public ResponseEntity<String> reorder(@PathVariable Integer orderId) {
+        orderService.reorderToCart(orderId);
+        return ResponseEntity.ok("Đã thêm các sản phẩm từ đơn hàng cũ vào giỏ hàng!");
+    }
 }

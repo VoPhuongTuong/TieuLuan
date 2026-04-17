@@ -49,3 +49,15 @@ Authorization: Bearer YOUR_TOKEN_HERE
     "quantity": 1
   }
 ]
+### 3. Lấy chi tiết đơn hàng
+GET http://127.0.0.1:8080/api/orders/10
+
+---
+
+### 4. Hủy đơn hàng (Chuyển status thành CANCELLED)
+PUT http://127.0.0.1:8080/api/orders/1/cancel
+
+---
+
+### 5. Mua lại đơn hàng
+POST http://127.0.0.1:8080/api/orders/1/reorder
