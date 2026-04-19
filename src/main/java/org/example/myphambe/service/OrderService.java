@@ -202,7 +202,6 @@ public class OrderService {
         dto.setRawId(order.getOrderId());
         dto.setTotal(order.getTotalPrice());
 
-        // Kiểm tra null cho status
         // Ép kiểu status về viết hoa (Ví dụ: "PENDING", "DELIVERED")
         String status = order.getStatus() != null ? order.getStatus().toUpperCase() : "PENDING";
         dto.setStatus(status);

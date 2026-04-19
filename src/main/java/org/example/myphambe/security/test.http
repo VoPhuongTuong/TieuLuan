@@ -65,6 +65,6 @@ PUT http://127.0.0.1:8080/api/orders/1/cancel
 POST http://127.0.0.1:8080/api/orders/1/reorder
 
 ### Lấy thống kê Dashboard
-GET http://localhost:8080/api/admin/orders
+GET http://localhost:8080/api/admin/products
 Accept: application/json
 
