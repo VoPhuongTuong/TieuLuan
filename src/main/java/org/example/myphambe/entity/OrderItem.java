@@ -14,18 +14,14 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderItemId;
-
     private Integer quantity;
-
     private BigDecimal price;
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
-
     @ManyToOne
     @JoinColumn(name = "product_id")
     @JsonIgnore   // 👈 THÊM DÒNG NÀY
-
     private Product product;
 }

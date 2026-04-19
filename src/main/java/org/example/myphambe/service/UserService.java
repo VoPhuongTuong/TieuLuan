@@ -36,7 +36,7 @@ public class UserService {
     private UserProfileDTO mapToDTO(User user) {
         return new UserProfileDTO(
                 user.getId(),
-                user.getUsername(),
+                user.getUserName(),
                 user.getFullName(),
                 user.getEmail(),
                 user.getAddress(),

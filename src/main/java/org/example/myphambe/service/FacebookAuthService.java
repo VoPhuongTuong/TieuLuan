@@ -34,7 +34,7 @@ public class FacebookAuthService {
                     User newUser = new User();
                     newUser.setEmail(email);
                     newUser.setFullName(fbUser.getName());
-                    newUser.setUsername("fb_" + fbUser.getId());
+                    newUser.setUserName("fb_" + fbUser.getId());
                     newUser.setRole(1); // Integer role khách hàng là 1
                     newUser.setPassword("");
                     return userRepository.save(newUser);

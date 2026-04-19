@@ -63,3 +63,8 @@ PUT http://127.0.0.1:8080/api/orders/1/cancel
 
 ### 5. Mua lại đơn hàng
 POST http://127.0.0.1:8080/api/orders/1/reorder
+
+### Lấy thống kê Dashboard
+GET http://localhost:8080/api/admin/orders
+Accept: application/json
+

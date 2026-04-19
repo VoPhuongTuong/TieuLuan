@@ -40,7 +40,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/chat/**").permitAll()
                                 .requestMatchers("/api/cart/**").permitAll()
                                 .requestMatchers("/api/orders/**").permitAll()
-                                .requestMatchers("/api/reviews/**").permitAll()
+                                .requestMatchers("/api/admin/dashboard/**").permitAll()                               .requestMatchers("/api/reviews/**").permitAll()
+                                .requestMatchers("/api/admin/orders/**").permitAll()
+                        .requestMatchers("/api/admin/orders").permitAll()
 
                                 .requestMatchers("/api/chat/**").permitAll()
 

@@ -12,8 +12,11 @@ import org.example.myphambe.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.example.myphambe.entity.CartItem;
 import org.example.myphambe.repository.CartItemRepository;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +29,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository; // Thêm repository này
-
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     public Order createOrder(Integer userId, List<CartItemRequest> cartItems) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -170,6 +173,73 @@ public class OrderService {
         }).toList();
 
         dto.setItems(items);
+        return dto;
+    }
+
+
+    //ADMIN
+    // Thêm vào OrderService.java
+    @Transactional(readOnly = true)
+    public List<OrderAdminResponseDTO> getAllOrdersForAdmin(String status, String search) {
+        List<Order> orders = orderRepository.findAllByAdmin(status, search);
+        return orders.stream().map(this::mapToAdminResponse).toList();
+    }
+
+    public OrderAdminResponseDTO updateStatusByAdmin(Integer orderId, String newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus(newStatus.toUpperCase());
+        Order saved = orderRepository.save(order);
+        return mapToAdminResponse(saved);
+    }
+
+    private OrderAdminResponseDTO mapToAdminResponse(Order order) {
+        OrderAdminResponseDTO dto = new OrderAdminResponseDTO();
+
+        // Map thông tin cơ bản
+        dto.setId("ORD" + String.format("%03d", order.getOrderId()));
+        dto.setRawId(order.getOrderId());
+        dto.setTotal(order.getTotalPrice());
+
+        // Kiểm tra null cho status
+        // Ép kiểu status về viết hoa (Ví dụ: "PENDING", "DELIVERED")
+        String status = order.getStatus() != null ? order.getStatus().toUpperCase() : "PENDING";
+        dto.setStatus(status);
+
+        // Sử dụng formatter dùng chung
+        dto.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().format(DATE_FORMATTER) : "");
+
+        dto.setPaymentMethod("COD");
+        dto.setPaymentStatus(status.equalsIgnoreCase("DELIVERED") ? "PAID" : "UNPAID");
+        dto.setNote("Giao hàng giờ hành chính");
+
+        // Map thông tin User
+        if (order.getUser() != null) {
+            OrderAdminResponseDTO.CustomerDTO cust = new OrderAdminResponseDTO.CustomerDTO();
+            cust.setName(order.getUser().getFullName());
+            cust.setPhone(order.getUser().getPhone());
+            cust.setAddress(order.getUser().getAddress());
+            cust.setEmail(order.getUser().getEmail());
+            dto.setCustomer(cust);
+        }
+
+        // Map danh sách sản phẩm
+        if (order.getItems() != null) {
+            dto.setItems(order.getItems().stream().map(i -> {
+                OrderAdminResponseDTO.ItemDTO itemDto = new OrderAdminResponseDTO.ItemDTO();
+                // Kiểm tra null cho Product để an toàn tuyệt đối
+                if (i.getProduct() != null) {
+                    itemDto.setName(i.getProduct().getName());
+                } else {
+                    itemDto.setName("Sản phẩm đã bị xóa");
+                }
+                itemDto.setQuantity(i.getQuantity());
+                itemDto.setPrice(i.getPrice());
+                return itemDto;
+            }).toList());
+        }
+
         return dto;
     }
 }

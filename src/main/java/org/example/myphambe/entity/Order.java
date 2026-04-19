@@ -11,17 +11,12 @@ import java.util.List;
 @Table(name = "orders")
 @Data
 public class Order {
-
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
-
     private LocalDateTime orderDate;
-
     private BigDecimal totalPrice;
-
     private String status;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

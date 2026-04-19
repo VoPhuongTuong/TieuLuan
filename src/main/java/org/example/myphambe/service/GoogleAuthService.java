@@ -42,7 +42,7 @@ public class GoogleAuthService {
                         newUser.setEmail(email);
                         newUser.setFullName(fullName);
                         newUser.setRole(1); // Mặc định role là 1 (USER)
-                        newUser.setUsername(email); // Username tạm lấy theo email
+                        newUser.setUserName(email); // Username tạm lấy theo email
                         // Password có thể để null hoặc generate ngẫu nhiên vì login qua Google
                         return userRepository.save(newUser);
                     });
