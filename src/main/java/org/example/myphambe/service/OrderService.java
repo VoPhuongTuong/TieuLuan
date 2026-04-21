@@ -30,6 +30,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository; // Thêm repository này
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
     public Order createOrder(Integer userId, List<CartItemRequest> cartItems) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -38,6 +39,10 @@ public class OrderService {
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus("PENDING");
+
+        // ✅ Thiết lập mặc định khi vừa tạo đơn
+        order.setPaymentMethod("COD");
+        order.setPaymentStatus("UNPAID");
 
         List<OrderItem> items = cartItems.stream().map(ci -> {
             Product product = productRepository.findById(ci.getProductId())
@@ -48,12 +53,10 @@ public class OrderService {
             item.setProduct(product);
             item.setQuantity(ci.getQuantity());
             item.setPrice(product.getPrice());
-
             return item;
         }).toList();
 
         order.setItems(items);
-
         BigDecimal total = items.stream()
                 .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -61,7 +64,6 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
-
 
     public List<OrderResponse> getOrdersByUser(Integer userId) {
 
@@ -151,12 +153,17 @@ public class OrderService {
     }
 
     // Helper method để tránh lặp code (Refactor từ hàm getOrdersByUser)
+// Cập nhật method mapToOrderResponse để trả về thêm paymentMethod và paymentStatus
     public OrderResponse mapToOrderResponse(Order order) {
         OrderResponse dto = new OrderResponse();
         dto.setOrderId(order.getOrderId());
         dto.setStatus(order.getStatus());
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderDate(order.getOrderDate());
+
+        // ✅ Thêm paymentMethod và paymentStatus
+        dto.setPaymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod() : "COD");
+        dto.setPaymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus() : "UNPAID");
 
         List<OrderItemDTO> items = order.getItems().stream().map(item -> {
             ProductDTO p = new ProductDTO();
@@ -176,7 +183,6 @@ public class OrderService {
         return dto;
     }
 
-
     //ADMIN
     // Thêm vào OrderService.java
     @Transactional(readOnly = true)
@@ -185,11 +191,19 @@ public class OrderService {
         return orders.stream().map(this::mapToAdminResponse).toList();
     }
 
+    // Cập nhật trạng thái bởi Admin
     public OrderAdminResponseDTO updateStatusByAdmin(Integer orderId, String newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        order.setStatus(newStatus.toUpperCase());
+        String statusUpper = newStatus.toUpperCase();
+        order.setStatus(statusUpper);
+
+        // ✅ Logic tự động: Nếu là COD và chuyển sang DELIVERED thì cập nhật đã thanh toán
+        if ("COD".equalsIgnoreCase(order.getPaymentMethod()) && "DELIVERED".equals(statusUpper)) {
+            order.setPaymentStatus("PAID");
+        }
+
         Order saved = orderRepository.save(order);
         return mapToAdminResponse(saved);
     }
@@ -197,23 +211,19 @@ public class OrderService {
     private OrderAdminResponseDTO mapToAdminResponse(Order order) {
         OrderAdminResponseDTO dto = new OrderAdminResponseDTO();
 
-        // Map thông tin cơ bản
         dto.setId("ORD" + String.format("%03d", order.getOrderId()));
         dto.setRawId(order.getOrderId());
         dto.setTotal(order.getTotalPrice());
-
-        // Ép kiểu status về viết hoa (Ví dụ: "PENDING", "DELIVERED")
-        String status = order.getStatus() != null ? order.getStatus().toUpperCase() : "PENDING";
-        dto.setStatus(status);
-
-        // Sử dụng formatter dùng chung
+        dto.setStatus(order.getStatus() != null ? order.getStatus().toUpperCase() : "PENDING");
         dto.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().format(DATE_FORMATTER) : "");
 
-        dto.setPaymentMethod("COD");
-        dto.setPaymentStatus(status.equalsIgnoreCase("DELIVERED") ? "PAID" : "UNPAID");
+        // ✅ Lấy trực tiếp từ Entity, không cần logic phức tạp nữa
+        dto.setPaymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().toUpperCase() : "COD");
+        dto.setPaymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus().toUpperCase() : "UNPAID");
+
         dto.setNote("Giao hàng giờ hành chính");
 
-        // Map thông tin User
+        // Map Customer & Items (Giữ nguyên như cũ)
         if (order.getUser() != null) {
             OrderAdminResponseDTO.CustomerDTO cust = new OrderAdminResponseDTO.CustomerDTO();
             cust.setName(order.getUser().getFullName());
@@ -223,22 +233,15 @@ public class OrderService {
             dto.setCustomer(cust);
         }
 
-        // Map danh sách sản phẩm
         if (order.getItems() != null) {
             dto.setItems(order.getItems().stream().map(i -> {
                 OrderAdminResponseDTO.ItemDTO itemDto = new OrderAdminResponseDTO.ItemDTO();
-                // Kiểm tra null cho Product để an toàn tuyệt đối
-                if (i.getProduct() != null) {
-                    itemDto.setName(i.getProduct().getName());
-                } else {
-                    itemDto.setName("Sản phẩm đã bị xóa");
-                }
+                itemDto.setName(i.getProduct() != null ? i.getProduct().getName() : "Sản phẩm đã xóa");
                 itemDto.setQuantity(i.getQuantity());
                 itemDto.setPrice(i.getPrice());
                 return itemDto;
             }).toList());
         }
-
         return dto;
     }
 }

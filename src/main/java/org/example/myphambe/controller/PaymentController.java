@@ -94,16 +94,16 @@ public class PaymentController {
 
         // ✅ Xử lý kết quả thanh toán
         if ("00".equals(responseCode)) {
-            order.setStatus("PAID");
+            order.setStatus("PENDING");
+            order.setPaymentMethod("VNPAY"); // ✅ Cập nhật phương thức
+            order.setPaymentStatus("PAID");  // ✅ Xác nhận đã trả tiền
 
-            // ✅ XÓA CART TẠI BACKEND (QUAN TRỌNG)
-//            cartRepository.deleteByUserId(order.getUser().getId());
             cartService.clearCart(order.getUser().getId());
-
         } else {
             order.setStatus("FAILED");
+            order.setPaymentMethod("VNPAY");
+            order.setPaymentStatus("UNPAID");
         }
-
         orderRepository.save(order);
 
         return "PAYMENT_COMPLETED";

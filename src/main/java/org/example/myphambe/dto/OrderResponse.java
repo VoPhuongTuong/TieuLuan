@@ -13,4 +13,8 @@ public class OrderResponse {
     private BigDecimal totalPrice;
     private LocalDateTime orderDate;
     private List<OrderItemDTO> items;
+
+    // ✅ Thêm 2 trường mới
+    private String paymentMethod;
+    private String paymentStatus;
 }

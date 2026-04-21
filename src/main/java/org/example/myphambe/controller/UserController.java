@@ -59,28 +59,4 @@ public class UserController {
 
         return userService.getProfile(email);
     }
-
-//    @PostMapping("/change-password")
-//    public String changePassword(
-//            Principal principal,
-//            @RequestBody ChangePasswordRequest request
-//    ) {
-//        changePasswordService.changePassword(principal.getName(), request);
-//        return "Đổi mật khẩu thành công";
-//    }
-//
-//    // ✅ Lấy thông tin profile
-//    @GetMapping("/profile")
-//    public UserProfileDTO getProfile(Principal principal) {
-//        return userService.getProfile(principal.getName());
-//    }
-//
-//    // ✅ Cập nhật profile
-//    @PutMapping("/profile")
-//    public UserProfileDTO updateProfile(
-//            Principal principal,
-//            @RequestBody UpdateProfileRequest request
-//    ) {
-//        return userService.updateProfile(principal.getName(), request);
-//    }
 }

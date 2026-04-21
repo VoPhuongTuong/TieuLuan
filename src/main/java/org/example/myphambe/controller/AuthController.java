@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor // Sử dụng cái này để tự động inject các "final" bên dưới
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class AuthController {
 

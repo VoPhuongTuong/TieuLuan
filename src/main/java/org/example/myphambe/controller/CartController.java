@@ -24,18 +24,6 @@ public class CartController {
         return cartService.getCart(userId);
     }
 
-    /* ===== ADD TO CART ===== */
-//    @PostMapping("/add")
-//    public String addToCart(@RequestBody CartItemRequest req) {
-//        cartService.addToCart(req);
-//        return "Added to cart";
-//    }
-//    @PostMapping("/{userId}/add")
-//    public String addToCart(@PathVariable Integer userId, @RequestBody CartItemRequest req) {
-//        req.setUserId(userId); // nếu cần
-//        cartService.addToCart(req);
-//        return "Added to cart";
-//    }
     @PostMapping("/{userId}/add")
     public ResponseEntity<String> addToCart(@PathVariable Integer userId, @RequestBody CartItemRequest req) {
         try {
@@ -72,7 +60,6 @@ public class CartController {
         System.out.println("DELETE productId = " + productId);
         System.out.println("DELETE userId = " + userId);
         return ResponseEntity.ok("Removed");
-//        (`/cart/${userId}/remove/${productId}`);
     }
 
     /* ===== CLEAR CART ===== */

@@ -32,13 +32,6 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
-    //    // Lấy chi tiết đơn hàng
-//    @GetMapping("/{orderId}")
-//    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer orderId) {
-//        return ResponseEntity.ok(orderService.getOrderById(orderId));
-//    }
-// Trong OrderService.java
-// Sửa lại đoạn này trong OrderController.java
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer orderId) {
         return ResponseEntity.ok(orderService.getOrderById(orderId));
@@ -51,12 +44,6 @@ public class OrderController {
         return ResponseEntity.ok("Đã hủy đơn hàng thành công");
     }
 
-//    @PostMapping("/create/{userId}")
-//    public ResponseEntity<OrderResponse> createOrder(...) {
-//        Order order = orderService.createOrder(userId, cartItems);
-//        // Chuyển sang Response DTO trước khi trả về
-//        return ResponseEntity.ok(orderService.mapToOrderResponse(order));
-//    }
 
     @PostMapping("/{orderId}/reorder")
     public ResponseEntity<String> reorder(@PathVariable Integer orderId) {

@@ -56,64 +56,6 @@ public class AuthService {
         log.info("REGISTER OK email={}, otp={}", request.getEmail(), otp);
     }
 
-    // ================= VERIFY OTP =================
-    // ================= VERIFY OTP =================
-//    public void verifyOtp(VerifyOtpRequest request) {
-//
-//        String email = request.getEmail();
-//        String otp = request.getOtp();
-//
-//        OtpData otpData = otpStorage.get(email);
-//        if (otpData == null) {
-//            throw new RuntimeException("OTP không tồn tại hoặc đã được sử dụng");
-//        }
-//
-//        // kiểm tra hết hạn
-////        if (System.currentTimeMillis() > otpData.getExpireAt()) {
-////            otpStorage.remove(email);
-////            pendingUsers.remove(email);
-////            throw new RuntimeException("OTP đã hết hạn");
-////        }
-//        if (System.currentTimeMillis() > otpData.getExpireAt()) {
-//            otpStorage.remove(email);
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST,
-//                    "OTP đã hết hạn"
-//            );
-//        }
-//
-//
-//        // kiểm tra OTP
-//        if (!otpData.getOtp().equals(otp)) {
-//            throw new RuntimeException("OTP không đúng");
-//        }
-//
-//        // lấy dữ liệu đăng ký tạm
-//        RegisterRequest registerRequest = pendingUsers.get(email);
-//        if (registerRequest == null) {
-//            throw new RuntimeException("Không tìm thấy dữ liệu đăng ký");
-//        }
-//        if (userRepository.existsByEmail(email)) {
-//            throw new RuntimeException("Email đã được đăng ký");
-//        }
-//
-//        // tạo user mới
-//        User user = new User();
-//        user.setEmail(registerRequest.getEmail());
-//        user.setFullName(registerRequest.getFullName());
-//        user.setRole(0); // USER
-//        user.setPassword(
-//                passwordEncoder.encode(registerRequest.getPassword())
-//        );
-//
-//        userRepository.save(user);
-//
-//        // xoá dữ liệu tạm
-//        otpStorage.remove(email);
-//        pendingUsers.remove(email);
-//
-//        log.info("VERIFY OTP SUCCESS | email={}", email);
-//    }
 public void verifyOtp(VerifyOtpRequest request) {
 
     String email = request.getEmail();
@@ -262,23 +204,6 @@ public void verifyOtp(VerifyOtpRequest request) {
 
         log.info("RESET PASSWORD OK | email={}", request.getEmail());
     }
-//    public void resendOtp(String email) {
-////        RegisterRequest data = pendingUsers.get(email);
-////        if (data == null) {
-////            throw new RuntimeException("REGISTER_DATA_NOT_FOUND");
-////        }
-//        if (!pendingUsers.containsKey(email)) {
-//            throw new RuntimeException("Không thể gửi lại OTP, vui lòng đăng ký lại");
-//        }
-//
-//        String otp = String.valueOf(new Random().nextInt(900000) + 100000);
-//        long expireAt = System.currentTimeMillis() + 60_000;
-//
-//        otpStorage.put(email, new OtpData(otp, expireAt));
-//        sendOtpEmail(email, otp);
-//
-//        log.info("RESEND OTP | email={} | otp={}", email, otp);
-//    }
 public void resendOtp(String email) {
     if (!pendingUsers.containsKey(email)) {
         throw new ResponseStatusException(
