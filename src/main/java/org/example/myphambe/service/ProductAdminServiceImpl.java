@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.myphambe.dto.ProductAdminDTO;
 import org.example.myphambe.entity.Product;
 import org.example.myphambe.entity.Category;
-import org.example.myphambe.repository.ProductAdminRepository;
+import org.example.myphambe.repository.ProductRepository;
 import org.example.myphambe.repository.CategoryRepository;
-import org.example.myphambe.service.ProductAdminService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductAdminServiceImpl implements ProductAdminService {
 
-    private final ProductAdminRepository productRepo;
+    private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
 
     @Override
@@ -25,6 +25,12 @@ public class ProductAdminServiceImpl implements ProductAdminService {
         return productRepo.findAll().stream()
                 .map(this::convertToAdminDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProductAdminDTO> getAllProductsForAdminWithPagination(Pageable pageable) {
+        return productRepo.findAll(pageable)
+                .map(this::convertToAdminDTO);
     }
 
     @Override
@@ -41,7 +47,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     public ProductAdminDTO updateProduct(Integer id, ProductAdminDTO dto) {
         Product existingProduct = productRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + id));
-        
+
         mapDtoToEntity(dto, existingProduct);
         return convertToAdminDTO(productRepo.save(existingProduct));
     }
@@ -58,7 +64,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    // Helper: Map từ Entity sang Admin DTO
+    // Helper methods giữ nguyên
     private ProductAdminDTO convertToAdminDTO(Product entity) {
         return ProductAdminDTO.builder()
                 .id(entity.getId())
@@ -74,7 +80,6 @@ public class ProductAdminServiceImpl implements ProductAdminService {
                 .build();
     }
 
-    // Helper: Map từ DTO sang Entity để lưu DB
     private void mapDtoToEntity(ProductAdminDTO dto, Product entity) {
         entity.setName(dto.getName());
         entity.setBrand(dto.getBrand());
@@ -83,7 +88,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
         entity.setDescription(dto.getDescription());
         entity.setYear(dto.getYear());
         entity.setStockQuantity(dto.getStockQuantity());
-        
+
         if (dto.getCategoryId() != null) {
             Category cat = categoryRepo.findById(dto.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category không tồn tại"));

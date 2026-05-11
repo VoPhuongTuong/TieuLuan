@@ -22,6 +22,13 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
     }
+    // Lấy toàn bộ danh sách review (tất cả sản phẩm)
+    public List<ReviewResponse> getAllReviews() {
+        return reviewRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 
     // Lấy danh sách review theo sản phẩm
     public List<ReviewResponse> getReviewsByProduct(Integer productId) {
