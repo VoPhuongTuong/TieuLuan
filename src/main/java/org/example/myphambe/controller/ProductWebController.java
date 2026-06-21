@@ -17,11 +17,8 @@ public class ProductWebController {
 
     @GetMapping("/product/{id}")
     public String getProductPage(@PathVariable Integer id, Model model) {
-
         Product product = productRepository.findById(id).orElse(null);
-
         model.addAttribute("product", product);
-
-        return "product"; // trả về product.html
+        return "product";
     }
 }

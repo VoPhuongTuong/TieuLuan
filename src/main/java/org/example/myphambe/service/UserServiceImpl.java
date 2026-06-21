@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserAdminService {
     public UserDTO createUser(UserDTO userDTO) {
         User user = new User();
         BeanUtils.copyProperties(userDTO, user);
-        user.setPassword("123456"); // Mật khẩu mặc định hoặc tạo random
+        user.setPassword("123456");
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
     }
@@ -69,18 +69,16 @@ public class UserServiceImpl implements UserAdminService {
         UserDTO dto = new UserDTO();
         BeanUtils.copyProperties(user, dto);
 
-        // 1. Tính toán thống kê
         Long totalOrders = userRepository.countTotalOrdersByUserId(user.getId());
         Double totalSpent = userRepository.sumTotalSpentByUserId(user.getId());
 
         dto.setTotalOrders(totalOrders != null ? totalOrders : 0L);
         dto.setTotalSpent(totalSpent != null ? totalSpent : 0.0);
 
-        // 2. Xử lý Avatar
         String nameForAvatar = (user.getFullName() != null) ? user.getFullName() : "User";
         dto.setAvatar("https://ui-avatars.com/api/?name=" +
                 nameForAvatar.replace(" ", "+") +
-                "&background=b124b1&color=fff"); // background màu tím theo style Skinly Admin
+                "&background=b124b1&color=fff");
 
         return dto;
     }

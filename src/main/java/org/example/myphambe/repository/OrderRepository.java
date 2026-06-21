@@ -17,13 +17,11 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByUserId(Integer userId);
 
     @EntityGraph(attributePaths = {"items", "items.product"})
-    java.util.Optional<Order> findById(Integer orderId); // Ghi đè hàm mặc định
+    java.util.Optional<Order> findById(Integer orderId);
 
         @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE LOWER(o.status) = LOWER(:status)")
         Double sumRevenueByStatus(@Param("status") String status);
 
-        // Trả về List<Object[]> để tránh lỗi Constructor DTO
-        // Object[0] sẽ là Date, Object[1] sẽ là Sum
         @Query("SELECT FUNCTION('DATE', o.orderDate), SUM(o.totalPrice) " +
                 "FROM Order o " +
                 "WHERE o.orderDate >= :startDate " +
@@ -31,12 +29,10 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                 "ORDER BY FUNCTION('DATE', o.orderDate) ASC")
         List<Object[]> getRawRevenueLast7Days(@Param("startDate") LocalDateTime startDate);
 
-    // Lấy danh sách đơn hàng mới nhất, kèm thông tin User để hiển thị tên khách hàng
     @Query("SELECT o FROM Order o JOIN FETCH o.user ORDER BY o.orderDate DESC")
     List<Order> findTopRecentOrders(Pageable pageable);
 
 
-    // Tìm kiếm đơn hàng theo tên User, SĐT hoặc ID cho Admin
     @Query("SELECT o FROM Order o WHERE " +
             "(:status = 'all' OR o.status = :status) AND " +
             "(CAST(o.orderId AS string) LIKE %:search% OR " +

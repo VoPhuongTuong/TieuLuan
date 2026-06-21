@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data // Tự động tạo Getter, Setter, toString, equals, hashCode
-@NoArgsConstructor // Tạo constructor không tham số (Bắt buộc cho Jackson/JSON)
-@AllArgsConstructor // Tạo constructor đầy đủ tham số
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RegisterRequest {
 
     @NotBlank(message = "Họ tên không được để trống")
@@ -25,6 +25,5 @@ public class RegisterRequest {
 
 
 
-    // Bạn có thể thêm trường này nếu muốn bắt người dùng nhập lại mk ở backend
-    // private String confirmPassword;
+
 }

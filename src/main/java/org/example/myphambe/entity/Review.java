@@ -12,7 +12,7 @@ public class Review {
     private Integer id;
     private String user;
     private String content;
-    private Integer stars; // 1-5
+    private Integer stars;
     @ManyToOne
     @JoinColumn(name = "product_id")
     @JsonIgnore

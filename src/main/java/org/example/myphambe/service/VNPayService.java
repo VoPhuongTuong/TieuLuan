@@ -21,7 +21,6 @@ public class VNPayService {
 
         Map<String, String> params = new HashMap<>();
 
-        // ===== FIX IP =====
         if (ipAddress == null || ipAddress.isEmpty()) {
             ipAddress = "127.0.0.1";
         }
@@ -29,15 +28,12 @@ public class VNPayService {
             ipAddress = "127.0.0.1";
         }
 
-        // ===== BASIC PARAMS =====
         params.put("vnp_Version", "2.1.0");
         params.put("vnp_Command", "pay");
         params.put("vnp_TmnCode", config.getTmnCode());
-        params.put("vnp_Amount", String.valueOf(amount * 100)); // VNPay yêu cầu *100
+        params.put("vnp_Amount", String.valueOf(amount * 100));
         params.put("vnp_CurrCode", "VND");
 
-        // ===== UNIQUE TXN REF =====
-//        String txnRef = orderId + "_" + UUID.randomUUID();
         String txnRef = String.valueOf(orderId);
         params.put("vnp_TxnRef", txnRef);
 
@@ -47,7 +43,6 @@ public class VNPayService {
         params.put("vnp_ReturnUrl", config.getReturnUrl());
         params.put("vnp_IpAddr", ipAddress);
 
-        // ===== TIME =====
         String createDate = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 
         Calendar cal = Calendar.getInstance();
@@ -57,7 +52,6 @@ public class VNPayService {
         params.put("vnp_CreateDate", createDate);
         params.put("vnp_ExpireDate", expireDate);
 
-        // ===== BUILD QUERY + HASH =====
         List<String> keys = new ArrayList<>(params.keySet());
         Collections.sort(keys);
 
@@ -71,7 +65,6 @@ public class VNPayService {
 
             if (value != null && !value.isEmpty()) {
 
-                // encode chuẩn VNPay
                 String encoded = URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
                         .replace("+", "%20");
 
@@ -87,12 +80,10 @@ public class VNPayService {
             }
         }
 
-        // ===== HASH =====
         String secureHash = hmacSHA512(config.getSecretKey(), hashData.toString());
 
         String paymentUrl = config.getPayUrl() + "?" + query + "&vnp_SecureHash=" + secureHash;
 
-        // ===== LOG DEBUG =====
         System.out.println("========== VNPAY DEBUG ==========");
         System.out.println("ORDER ID: " + orderId);
         System.out.println("TXN REF: " + txnRef);
@@ -106,7 +97,6 @@ public class VNPayService {
 
     public boolean verifySignature(Map<String, String> params, String receivedHash) throws Exception {
 
-        // remove hash fields
         params.remove("vnp_SecureHash");
         params.remove("vnp_SecureHashType");
 
@@ -135,7 +125,6 @@ public class VNPayService {
 
         String calcHash = hmacSHA512(config.getSecretKey(), hashData.toString());
 
-        // ===== LOG =====
         System.out.println("========== VERIFY DEBUG ==========");
         System.out.println("HASH DATA: " + hashData);
         System.out.println("CALC HASH: " + calcHash);

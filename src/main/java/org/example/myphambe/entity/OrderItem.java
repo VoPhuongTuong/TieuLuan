@@ -22,6 +22,6 @@ public class OrderItem {
     private Order order;
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @JsonIgnore   // 👈 THÊM DÒNG NÀY
+    @JsonIgnore
     private Product product;
 }

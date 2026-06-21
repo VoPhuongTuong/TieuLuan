@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories") // Khớp với file api.ts của bạn
+@RequestMapping("/api/categories")
 @CrossOrigin(origins = "*")
 public class CategoryAdminController {
 
     @Autowired
     private CategoryService categoryService;
 
-    // Lấy danh sách kèm số lượng để hiện thị ở Dashboard/Categories Admin
     @GetMapping
     public List<CategoryDTO> getCategories() {
         return categoryService.getAllCategoriesWithCount();

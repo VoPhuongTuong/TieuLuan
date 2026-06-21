@@ -28,40 +28,33 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final CartItemRepository cartItemRepository; // Thêm repository này
+    private final CartItemRepository cartItemRepository;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Order createOrder(Integer userId, List<CartItemRequest> cartItems) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus("PENDING");
-
-        // ✅ Thiết lập mặc định khi vừa tạo đơn
         order.setPaymentMethod("COD");
         order.setPaymentStatus("UNPAID");
-
         List<OrderItem> items = cartItems.stream().map(ci -> {
             Product product = productRepository.findById(ci.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
-
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(ci.getQuantity());
-            item.setPrice(product.getPrice());
+            item.setPrice(ci.getPrice() != null ? ci.getPrice() : product.getPrice());
             return item;
         }).toList();
-
         order.setItems(items);
         BigDecimal total = items.stream()
                 .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalPrice(total);
-
         return orderRepository.save(order);
     }
 
@@ -100,14 +93,12 @@ public class OrderService {
         }).toList();
     }
 
-    // 1. Lấy chi tiết 1 đơn hàng
     public OrderResponse getOrderById(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
         return mapToOrderResponse(order);
     }
 
-    // 2. Hủy đơn hàng (Chỉ cho phép khi đang PENDING)
     public void cancelOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
@@ -120,29 +111,23 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    // 3. Mua lại đơn hàng (Reorder)
     public void reorderToCart(Integer orderId) {
-        // 1. Tìm đơn hàng cũ
         Order oldOrder = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại"));
 
         User user = oldOrder.getUser();
 
-        // 2. Duyệt qua từng sản phẩm trong đơn hàng cũ
         for (OrderItem orderItem : oldOrder.getItems()) {
             Product product = orderItem.getProduct();
 
-            // 3. Kiểm tra xem sản phẩm này đã có trong giỏ hàng của user chưa
             Optional<CartItem> existingItem = cartItemRepository
                     .findByUser_IdAndProduct_Id(user.getId(), product.getId());
 
             if (existingItem.isPresent()) {
-                // Nếu đã có, cộng dồn số lượng
                 CartItem cartItem = existingItem.get();
                 cartItem.setQuantity(cartItem.getQuantity() + orderItem.getQuantity());
                 cartItemRepository.save(cartItem);
             } else {
-                // Nếu chưa có, tạo mới một dòng trong giỏ hàng
                 CartItem newCartItem = new CartItem();
                 newCartItem.setUser(user);
                 newCartItem.setProduct(product);
@@ -152,8 +137,7 @@ public class OrderService {
         }
     }
 
-    // Helper method để tránh lặp code (Refactor từ hàm getOrdersByUser)
-// Cập nhật method mapToOrderResponse để trả về thêm paymentMethod và paymentStatus
+
     public OrderResponse mapToOrderResponse(Order order) {
         OrderResponse dto = new OrderResponse();
         dto.setOrderId(order.getOrderId());
@@ -161,7 +145,6 @@ public class OrderService {
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderDate(order.getOrderDate());
 
-        // ✅ Thêm paymentMethod và paymentStatus
         dto.setPaymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod() : "COD");
         dto.setPaymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus() : "UNPAID");
 
@@ -183,15 +166,12 @@ public class OrderService {
         return dto;
     }
 
-    //ADMIN
-    // Thêm vào OrderService.java
     @Transactional(readOnly = true)
     public List<OrderAdminResponseDTO> getAllOrdersForAdmin(String status, String search) {
         List<Order> orders = orderRepository.findAllByAdmin(status, search);
         return orders.stream().map(this::mapToAdminResponse).toList();
     }
 
-    // Cập nhật trạng thái bởi Admin
     public OrderAdminResponseDTO updateStatusByAdmin(Integer orderId, String newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
@@ -199,7 +179,6 @@ public class OrderService {
         String statusUpper = newStatus.toUpperCase();
         order.setStatus(statusUpper);
 
-        // ✅ Logic tự động: Nếu là COD và chuyển sang DELIVERED thì cập nhật đã thanh toán
         if ("COD".equalsIgnoreCase(order.getPaymentMethod()) && "DELIVERED".equals(statusUpper)) {
             order.setPaymentStatus("PAID");
         }
@@ -217,13 +196,11 @@ public class OrderService {
         dto.setStatus(order.getStatus() != null ? order.getStatus().toUpperCase() : "PENDING");
         dto.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().format(DATE_FORMATTER) : "");
 
-        // ✅ Lấy trực tiếp từ Entity, không cần logic phức tạp nữa
         dto.setPaymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().toUpperCase() : "COD");
         dto.setPaymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus().toUpperCase() : "UNPAID");
 
         dto.setNote("Giao hàng giờ hành chính");
 
-        // Map Customer & Items (Giữ nguyên như cũ)
         if (order.getUser() != null) {
             OrderAdminResponseDTO.CustomerDTO cust = new OrderAdminResponseDTO.CustomerDTO();
             cust.setName(order.getUser().getFullName());

@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class OtpData {
     private String otp;
-    private long expireAt; // millis
+    private long expireAt;
 }

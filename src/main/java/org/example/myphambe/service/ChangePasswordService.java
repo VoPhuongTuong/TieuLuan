@@ -16,26 +16,18 @@ public class ChangePasswordService {
 
     public void changePassword(String email, ChangePasswordRequest req) {
 
-        // 🔍 tìm user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ❌ kiểm tra mật khẩu cũ
         if (!passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu cũ không đúng");
         }
 
-        // ❌ không cho trùng mật khẩu cũ
         if (passwordEncoder.matches(req.getNewPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu mới không được trùng mật khẩu cũ");
         }
-
-        // 🔐 encode mật khẩu mới
         String encodedPassword = passwordEncoder.encode(req.getNewPassword());
-
         user.setPassword(encodedPassword);
-
-        // 💾 lưu DB
         userRepository.save(user);
     }
 }

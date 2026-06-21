@@ -25,7 +25,6 @@ public class CartService {
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
 
-    /* ================= GET CART ================= */
     public List<CartItemResponse> getCart(Integer userId) {
         return cartRepo.findByUser_Id(userId)
                 .stream()
@@ -33,28 +32,20 @@ public class CartService {
                 .collect(Collectors.toList());
     }
 
-    /* ================= ADD TO CART ================= */
     public void addToCart(CartItemRequest req) {
-
         if (req.getQuantity() == null || req.getQuantity() <= 0) {
             throw new RuntimeException("Quantity must be > 0");
         }
-
         User user = userRepo.findById(req.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         Product product = productRepo.findById(req.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        // chỉ check stock (KHÔNG trừ)
         if (product.getStockQuantity() < req.getQuantity()) {
             throw new RuntimeException("Out of stock");
         }
-
         CartItem existing = cartRepo
                 .findByUser_IdAndProduct_Id(req.getUserId(), req.getProductId())
                 .orElse(null);
-
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + req.getQuantity());
             cartRepo.save(existing);
@@ -64,12 +55,10 @@ public class CartService {
             item.setProduct(product);
             item.setQuantity(req.getQuantity());
             item.setAddedAt(LocalDateTime.now());
-
             cartRepo.save(item);
         }
     }
 
-    /* ================= UPDATE QUANTITY ================= */
     public void updateQuantity(CartItemRequest req) {
 
         if (req.getQuantity() == null || req.getQuantity() < 0) {
@@ -80,13 +69,11 @@ public class CartService {
                 .findByUser_IdAndProduct_Id(req.getUserId(), req.getProductId())
                 .orElseThrow(() -> new RuntimeException("Item not found"));
 
-        // nếu = 0 → xoá luôn
         if (req.getQuantity() == 0) {
             cartRepo.delete(item);
             return;
         }
 
-        // check stock (KHÔNG trừ)
         Product product = item.getProduct();
         if (product.getStockQuantity() < req.getQuantity()) {
             throw new RuntimeException("Not enough stock");
@@ -96,23 +83,18 @@ public class CartService {
         cartRepo.save(item);
     }
 
-    /* ================= REMOVE ITEM ================= */
     public void removeItem(Integer userId, Integer productId) {
-
         CartItem item = cartRepo
                 .findByUser_IdAndProduct_Id(userId, productId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
-
         cartRepo.delete(item);
     }
 
-    /* ================= CLEAR CART ================= */
     public void clearCart(Integer userId) {
         List<CartItem> items = cartRepo.findByUser_Id(userId);
         cartRepo.deleteAll(items);
     }
 
-    /* ================= MAP DTO ================= */
     private CartItemResponse mapToResponse(CartItem item) {
         CartItemResponse res = new CartItemResponse();
         res.setProductId(item.getProduct().getId());

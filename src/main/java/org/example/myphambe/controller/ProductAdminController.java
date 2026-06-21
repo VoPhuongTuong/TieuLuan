@@ -21,13 +21,11 @@ public class ProductAdminController {
 
     private final ProductAdminService adminService;
 
-    // Endpoint cũ - lấy tất cả (giữ để tương thích)
     @GetMapping("/all")
     public ResponseEntity<List<ProductAdminDTO>> getAll() {
         return ResponseEntity.ok(adminService.getAllProductsForAdmin());
     }
 
-    // Endpoint mới - có phân trang
     @GetMapping
     public ResponseEntity<PageResponseDTO<ProductAdminDTO>> getAllWithPagination(
             @RequestParam(defaultValue = "0") int page,

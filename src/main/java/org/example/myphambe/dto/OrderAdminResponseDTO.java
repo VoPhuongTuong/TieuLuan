@@ -6,14 +6,14 @@ import java.math.BigDecimal;
 import java.util.List;
 @Data
 public class OrderAdminResponseDTO {
-    private String id; // Map từ orderId (String để khớp với React Native)
-    private Integer rawId; // ID nguyên bản để gọi API update
+    private String id;
+    private Integer rawId;
     private CustomerDTO customer;
     private List<ItemDTO> items;
     private BigDecimal total;
     private String status;
-    private String paymentMethod; // Mặc định "COD" nếu database chưa có
-    private String paymentStatus; // "paid" hoặc "unpaid" dựa trên status
+    private String paymentMethod;
+    private String paymentStatus;
     private String orderDate;
     private String note;
 

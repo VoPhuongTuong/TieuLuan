@@ -22,7 +22,6 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
     }
-    // Lấy toàn bộ danh sách review (tất cả sản phẩm)
     public List<ReviewResponse> getAllReviews() {
         return reviewRepository.findAll()
                 .stream()
@@ -30,7 +29,6 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // Lấy danh sách review theo sản phẩm
     public List<ReviewResponse> getReviewsByProduct(Integer productId) {
         return reviewRepository.findByProductId(productId)
                 .stream()
@@ -38,7 +36,6 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // Thêm Review
     public ReviewResponse addReview(Integer productId, ReviewRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
@@ -53,7 +50,6 @@ public class ReviewService {
         return mapToResponse(savedReview);
     }
 
-    // Sửa Review
     public ReviewResponse updateReview(Integer reviewId, ReviewRequest request) {
         Review existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bình luận này"));
@@ -65,7 +61,6 @@ public class ReviewService {
         return mapToResponse(updatedReview);
     }
 
-    // Xóa Review
     public void deleteReview(Integer reviewId) {
         if (!reviewRepository.existsById(reviewId)) {
             throw new RuntimeException("Không tìm thấy bình luận để xóa");
@@ -73,7 +68,6 @@ public class ReviewService {
         reviewRepository.deleteById(reviewId);
     }
 
-    // Helper method: Chuyển từ Entity sang Response DTO
     private ReviewResponse mapToResponse(Review review) {
         return ReviewResponse.builder()
                 .id(review.getId())

@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 
 @RequestMapping("/api/admin/dashboard")
-// Cho phép React Native gọi API từ localhost hoặc IP khác
-//@org.springframework.web.bind.annotation.CrossOrigin(origins = "*")
 public class DashboardController {
 
     @Autowired

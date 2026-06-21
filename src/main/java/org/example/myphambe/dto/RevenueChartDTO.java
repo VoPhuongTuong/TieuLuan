@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RevenueChartDTO {
-    private String label; // Ví dụ: "2024-01-15" hoặc "Thứ 2"
-    private Double value; // Doanh thu của ngày đó
+    private String label;
+    private Double value;
 }

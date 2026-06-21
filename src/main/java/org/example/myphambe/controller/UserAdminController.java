@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/users")
-@CrossOrigin(origins = "*") // Cho phép React Native gọi API
+@CrossOrigin(origins = "*")
 public class UserAdminController {
 
     @Autowired

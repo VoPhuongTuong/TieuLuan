@@ -22,8 +22,5 @@ public class ProductAdminDTO {
     private Integer stockQuantity;
     private Integer categoryId; 
     private String categoryName;
-    
-    // Bạn có thể thêm các trường dành riêng cho Admin như:
-    // private LocalDateTime createdAt;
-    // private String createdBy;
+
 }

@@ -18,7 +18,6 @@ public class CartController {
 
     private final CartService cartService;
 
-    /* ===== GET CART ===== */
     @GetMapping("/{userId}")
     public List<CartItemResponse> getCart(@PathVariable Integer userId) {
         return cartService.getCart(userId);
@@ -37,7 +36,6 @@ public class CartController {
         }
     }
 
-    /* ===== UPDATE QUANTITY ===== */
     @PutMapping("/{userId}/update")
     public ResponseEntity<String> updateQuantity(
             @PathVariable Integer userId,
@@ -51,7 +49,6 @@ public class CartController {
         }
     }
 
-    /* ===== REMOVE ITEM ===== */
     @DeleteMapping("/{userId}/remove/{productId}")
     public ResponseEntity<String> removeItem(
             @PathVariable Integer userId,
@@ -62,7 +59,6 @@ public class CartController {
         return ResponseEntity.ok("Removed");
     }
 
-    /* ===== CLEAR CART ===== */
     @DeleteMapping("/{userId}/clear")
     public ResponseEntity<String> clearCart(@PathVariable Integer userId) {
         cartService.clearCart(userId);

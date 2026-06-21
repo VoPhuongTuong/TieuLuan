@@ -29,31 +29,22 @@ public class AuthService {
     private final JavaMailSender mailSender;
     private final JwtUtil jwtUtil;
 
-
-    // LƯU TẠM
     private final Map<String, RegisterRequest> pendingUsers = new ConcurrentHashMap<>();
     private final Map<String, OtpData> otpStorage = new ConcurrentHashMap<>();
     private final Map<String, OtpData> resetOtpStorage = new ConcurrentHashMap<>();
 
 
-    // ================= REGISTER =================
     public void register(RegisterRequest request) {
-
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email đã tồn tại");
         }
-
         String otp = String.valueOf(
                 new Random().nextInt(900000) + 100000
         );
-        long expireAt = System.currentTimeMillis() + 60_000; // ⏰ 1 phút
-
+        long expireAt = System.currentTimeMillis() + 60_000;
         pendingUsers.put(request.getEmail(), request);
         otpStorage.put(request.getEmail(), new OtpData(otp, expireAt));
-
         sendOtpEmail(request.getEmail(), otp);
-
-        log.info("REGISTER OK email={}, otp={}", request.getEmail(), otp);
     }
 
 public void verifyOtp(VerifyOtpRequest request) {
@@ -107,7 +98,6 @@ public void verifyOtp(VerifyOtpRequest request) {
 
     userRepository.save(user);
 
-    // ✅ CHỈ XOÁ KHI THÀNH CÔNG
     otpStorage.remove(email);
     pendingUsers.remove(email);
 
@@ -125,8 +115,6 @@ public void verifyOtp(VerifyOtpRequest request) {
                 request.getPassword(),
                 user.getPassword()
         );
-
-        log.info("LOGIN email={} match={}", request.getEmail(), match);
 
         if (!match) {
             throw new RuntimeException("Sai mật khẩu");
@@ -148,7 +136,6 @@ public void verifyOtp(VerifyOtpRequest request) {
     }
 
 
-    // ================= SEND MAIL =================
     private void sendOtpEmail(String to, String otp) {
         try {
             SimpleMailMessage mail = new SimpleMailMessage();

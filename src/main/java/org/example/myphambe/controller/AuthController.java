@@ -21,27 +21,23 @@ public class AuthController {
     private final GoogleAuthService googleAuthService;
     private final FacebookAuthService facebookAuthService;
 
-    // ===== REGISTER =====
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.ok("OTP đã được gửi qua Email");
     }
 
-    // ===== VERIFY OTP =====
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpRequest request) {
         authService.verifyOtp(request);
         return ResponseEntity.ok("Xác thực thành công");
     }
 
-    // ===== LOGIN THƯỜNG =====
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    // --- QUÊN MẬT KHẨU ---
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request);
@@ -60,7 +56,7 @@ public class AuthController {
         return ResponseEntity.ok("OTP mới đã được gửi");
     }
 
-    // --- ĐĂNG NHẬP GOOGLE ---
+
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
         try {
@@ -74,7 +70,6 @@ public class AuthController {
         }
     }
 
-    // --- ĐĂNG NHẬP FACEBOOK ---
     @PostMapping("/facebook")
     public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> request) {
         try {
@@ -82,7 +77,6 @@ public class AuthController {
             if (accessToken == null || accessToken.isEmpty()) {
                 return ResponseEntity.badRequest().body("Access Token không được để trống");
             }
-            // Gọi qua Service để xử lý trọn gói và trả về LoginResponse chuẩn (id, fullName, email, role, token)
             return ResponseEntity.ok(facebookAuthService.authenticateFacebookUser(accessToken));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Lỗi Facebook: " + e.getMessage());

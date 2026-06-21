@@ -16,9 +16,9 @@ public class Order {
     private Integer orderId;
     private LocalDateTime orderDate;
     private BigDecimal totalPrice;
-    private String status; // PENDING, SHIPPED, DELIVERED, CANCELLED
-    private String paymentMethod; // COD, VNPAY
-    private String paymentStatus; // UNPAID, PAID
+    private String status;
+    private String paymentMethod;
+    private String paymentStatus;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

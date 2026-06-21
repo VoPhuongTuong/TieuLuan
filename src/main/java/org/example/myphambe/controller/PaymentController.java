@@ -22,9 +22,7 @@ public class PaymentController {
     private final VNPayService vnPayService;
     private final CartItemRepository cartRepository;
     private final CartService cartService;
-    // ✅ thêm
 
-    // ===================== CREATE PAYMENT =====================
     @PostMapping("/vnpay/create")
     public Map<String, String> createPayment(
             @RequestBody Map<String, Object> body,
@@ -40,18 +38,15 @@ public class PaymentController {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // ✅ Lấy IP chuẩn
         String ip = request.getHeader("X-FORWARDED-FOR");
         if (ip == null || ip.isEmpty()) {
             ip = request.getRemoteAddr();
         }
 
-        // fix localhost IPv6
         if ("0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "127.0.0.1";
         }
 
-        // ⚠️ QUAN TRỌNG: nhân 100 tại đây nếu frontend chưa làm
         long finalAmount = amount;
 
         String paymentUrl = vnPayService.createPaymentUrl(orderId, finalAmount, ip);
@@ -71,7 +66,6 @@ public class PaymentController {
 
         String secureHash = params.get("vnp_SecureHash");
 
-        // ❌ remove hash trước khi verify
         params.remove("vnp_SecureHash");
         params.remove("vnp_SecureHashType");
 
@@ -85,18 +79,16 @@ public class PaymentController {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // 🚨 FIX QUAN TRỌNG: check chữ ký trước
         if (!valid) {
             order.setStatus("FAILED");
             orderRepository.save(order);
             return "INVALID_SIGNATURE";
         }
 
-        // ✅ Xử lý kết quả thanh toán
         if ("00".equals(responseCode)) {
             order.setStatus("PENDING");
-            order.setPaymentMethod("VNPAY"); // ✅ Cập nhật phương thức
-            order.setPaymentStatus("PAID");  // ✅ Xác nhận đã trả tiền
+            order.setPaymentMethod("VNPAY");
+            order.setPaymentStatus("PAID");
 
             cartService.clearCart(order.getUser().getId());
         } else {

@@ -23,13 +23,10 @@ public class UserService {
     public UserProfileDTO updateProfile(String email, UpdateProfileRequest req) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         user.setFullName(req.getFullName());
         user.setAddress(req.getAddress());
         user.setPhone(req.getPhone());
-
         userRepository.save(user);
-
         return mapToDTO(user);
     }
 

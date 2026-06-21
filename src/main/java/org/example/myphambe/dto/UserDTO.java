@@ -8,10 +8,9 @@ public class UserDTO {
     private String email;
     private String address;
     private String phone;
-    private Integer role; // 1: Admin, 0: User
-    private String avatar; // Để map với URL avatar ở frontend
+    private Integer role;
+    private String avatar;
     
-    // Bạn có thể thêm các field thống kê nếu cần
     private Long totalOrders;
     private Double totalSpent;
 }

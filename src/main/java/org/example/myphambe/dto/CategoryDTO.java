@@ -8,5 +8,5 @@ import lombok.Data;
 public class CategoryDTO {
     private Integer id;
     private String name;
-    private Long productCount; // Trường đếm số lượng sản phẩm
+    private Long productCount;
 }

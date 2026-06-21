@@ -20,7 +20,6 @@ public class GoogleAuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    // Thay bằng Client ID (Web) bạn lấy từ Google Cloud Console
     private final String GOOGLE_CLIENT_ID = "270128411389-puaajt7jbuec792sp5mli4kkg1t78b25.apps.googleusercontent.com";
 
     public LoginResponse authenticateGoogleUser(String idTokenString) throws Exception {
@@ -34,23 +33,18 @@ public class GoogleAuthService {
             String email = payload.getEmail();
             String fullName = (String) payload.get("name");
 
-            // Kiểm tra user trong DB
             User user = userRepository.findByEmail(email)
                     .orElseGet(() -> {
-                        // Nếu chưa có thì tự động tạo tài khoản mới
                         User newUser = new User();
                         newUser.setEmail(email);
                         newUser.setFullName(fullName);
-                        newUser.setRole(1); // Mặc định role là 1 (USER)
-                        newUser.setUserName(email); // Username tạm lấy theo email
-                        // Password có thể để null hoặc generate ngẫu nhiên vì login qua Google
+                        newUser.setRole(1);
+                        newUser.setUserName(email);
                         return userRepository.save(newUser);
                     });
 
-            // Tạo Token từ JwtUtil của bạn (sử dụng: id, email, role)
             String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole());
 
-            // Trả về đúng format LoginResponse hiện tại của bạn
             return new LoginResponse(
                     user.getId(),
                     user.getFullName(),

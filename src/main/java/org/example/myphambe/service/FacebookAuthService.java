@@ -14,11 +14,9 @@ import org.springframework.web.client.RestTemplate;
 public class FacebookAuthService {
 
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil; // Inject JwtUtil thay vì Provider
-    private final RestTemplate restTemplate; // Bean này lấy từ SecurityConfig mình bảo bạn thêm ở trên
-
+    private final JwtUtil jwtUtil;
+    private final RestTemplate restTemplate;
     public LoginResponse authenticateFacebookUser(String accessToken) {
-        // 1. Lấy thông tin từ Facebook Graph API
         String url = "https://graph.facebook.com/me?access_token={token}&fields=id,name,email";
         FacebookUserResponse fbUser = restTemplate.getForObject(url, FacebookUserResponse.class, accessToken);
 
@@ -26,7 +24,6 @@ public class FacebookAuthService {
             throw new RuntimeException("Xác thực Facebook thất bại");
         }
 
-        // 2. Kiểm tra hoặc tạo User mới
         String email = fbUser.getEmail() != null ? fbUser.getEmail() : fbUser.getId() + "@facebook.com";
 
         User user = userRepository.findByEmail(email)
@@ -35,16 +32,13 @@ public class FacebookAuthService {
                     newUser.setEmail(email);
                     newUser.setFullName(fbUser.getName());
                     newUser.setUserName("fb_" + fbUser.getId());
-                    newUser.setRole(1); // Integer role khách hàng là 1
+                    newUser.setRole(1);
                     newUser.setPassword("");
                     return userRepository.save(newUser);
                 });
 
-        // 3. Tạo JWT sử dụng đúng hàm generateToken của bạn
-        // Hàm của bạn: generateToken(Integer id, String email, Integer role)
         String jwt = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole());
 
-        // 4. Trả về LoginResponse chuẩn của bạn
         return new LoginResponse(
                 user.getId(),
                 user.getFullName(),

@@ -15,10 +15,12 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     public List<CategoryDTO> getAllCategoriesWithCount() {
+
         return categoryRepository.findAllWithProductCount();
     }
 
     public Category createCategory(Category category) {
+
         return categoryRepository.save(category);
     }
 
@@ -30,7 +32,6 @@ public class CategoryService {
     }
 
     public void deleteCategory(Integer id) {
-        // Bạn có thể thêm logic kiểm tra: nếu productCount > 0 thì không cho xóa
         categoryRepository.deleteById(id);
     }
 }

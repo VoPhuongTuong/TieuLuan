@@ -11,5 +11,5 @@ public class DashboardStatsDTO {
     private long totalProducts;
     private long totalUsers;
     private List<RevenueChartDTO> chartData;
-    private List<RecentOrderDTO> recentOrders; // Thêm dòng này
+    private List<RecentOrderDTO> recentOrders;
 }
